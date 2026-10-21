@@ -1,0 +1,10 @@
+{
+  "application": "torrents",
+  "directory": "torrents",
+  "packages": [
+    "nixe-torrents"
+  ],
+  "manifest": "Cargo.toml",
+  "prepare": [],
+  "binaries": []
+}
