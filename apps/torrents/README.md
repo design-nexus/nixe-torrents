@@ -35,7 +35,7 @@ your Omarchy theme and fits a half-screen tile.
 ## Install
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/design-nexus/nixe/main/install.sh | bash -s -- torrents
+curl -fsSL https://raw.githubusercontent.com/design-nexus/nixe-torrents/main/install.sh | bash -s -- torrents
 ```
 
 This installs any missing build dependencies (`rust gtk4 libtorrent-rasterbar boost`),
