@@ -169,7 +169,7 @@ pub mod bridge {
     }
 
     unsafe extern "C++" {
-        include!("nixe-torrents/engine/shim.h");
+        include!("nyx-torrents/engine/shim.h");
 
         type Session;
 

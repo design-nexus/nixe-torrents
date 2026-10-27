@@ -1,10 +1,10 @@
-//! Torrents' tools on the control interface (`nixe_core::control`), for Nixe Assistant:
+//! Torrents' tools on the control interface (`nyx_core::control`), for Nyx Assistant:
 //! what's downloading, add a magnet or .torrent link, pause or resume one. Nothing is
 //! removed; adding goes through the usual add dialog when that's switched on.
 
 use crate::engine::{ffi::Status, Command};
 use crate::{actions, live, model};
-use nixe_core::control::text;
+use nyx_core::control::text;
 use serde_json::{json, Value};
 
 pub fn tools() -> Value {

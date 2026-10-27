@@ -1,7 +1,7 @@
 //! This app's own preferences (`~/.config/torrents/settings.toml`): the window's
 //! look and every torrent setting.
 
-pub use nixe_theme::ThemeMode;
+pub use nyx_theme::ThemeMode;
 
 use crate::paths;
 use serde::{Deserialize, Serialize};
@@ -181,7 +181,7 @@ impl Default for Prefs {
     }
 }
 
-nixe_core::prefs_store!(Prefs, nixe_core::prefs::Store::standard_with(fix));
+nyx_core::prefs_store!(Prefs, nyx_core::prefs::Store::standard_with(fix));
 
 /// Like qBittorrent, pick a random listening port on first run (and keep it).
 fn fix(p: &mut Prefs) -> bool {

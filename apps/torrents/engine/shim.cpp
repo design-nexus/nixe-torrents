@@ -1,8 +1,8 @@
 // A thin, value-only wrapper around libtorrent's session for the Rust side.
 // Everything is keyed by the torrent's id: the hex of info_hashes().get_best().
 
-#include "nixe-torrents/engine/shim.h"
-#include "nixe-torrents/src/engine/ffi.rs.h"
+#include "nyx-torrents/engine/shim.h"
+#include "nyx-torrents/src/engine/ffi.rs.h"
 
 #include <libtorrent/add_torrent_params.hpp>
 #include <libtorrent/alert_types.hpp>

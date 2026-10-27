@@ -2,7 +2,7 @@
   "application": "torrents",
   "directory": "torrents",
   "packages": [
-    "nixe-torrents"
+    "nyx-torrents"
   ],
   "manifest": "Cargo.toml",
   "prepare": [],
@@ -13,9 +13,9 @@
       "test",
       "--locked",
       "-p",
-      "nixe-torrents",
+      "nyx-torrents",
       "--bin",
-      "nixe-torrents"
+      "nyx-torrents"
     ]
   ]
 }

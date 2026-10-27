@@ -23,9 +23,9 @@ mod window;
 use gtk::prelude::*;
 use gtk::{gio, glib};
 
-const APP_ID: &str = "io.github.design_nexus.nixe.Torrents";
+const APP_ID: &str = "io.github.design_nexus.nyx.Torrents";
 
-const USAGE: &str = "Usage: nixe-torrents [--section ID] [--quit] [FILE.torrent | MAGNET | URL]...\n\
+const USAGE: &str = "Usage: nyx-torrents [--section ID] [--quit] [FILE.torrent | MAGNET | URL]...\n\
 \n\
   --section ID   open (or switch the open window) to a page: all, downloading, seeding,\n\
                  completed, paused, active, inactive, errored, cat:NAME, tag:NAME, search,\n\
@@ -35,8 +35,8 @@ const USAGE: &str = "Usage: nixe-torrents [--section ID] [--quit] [FILE.torrent 
 Torrent files, magnet links and links to .torrent files are added to the running window.\n";
 
 fn main() -> glib::ExitCode {
-    nixe_core::app::init(nixe_core::app::App { slug: "nixe-torrents", name: "Torrents" });
-    nixe_core::migrate::from(&["torrents"]);
+    nyx_core::app::init(nyx_core::app::App { slug: "nyx-torrents", name: "Torrents" });
+    nyx_core::migrate::from(&["torrents"]);
     let args: Vec<String> = std::env::args().collect();
     if args.iter().any(|a| a == "--help" || a == "-h") {
         print!("{USAGE}");
@@ -50,8 +50,8 @@ fn main() -> glib::ExitCode {
         flags |= gio::ApplicationFlags::NON_UNIQUE;
     }
     let app = gtk::Application::builder().application_id(APP_ID).flags(flags).build();
-    // Nixe Assistant lists, adds and pauses torrents through this (primary instance only).
-    app.connect_startup(|app| nixe_core::control::serve(app, control::tools(), control::handle));
+    // Nyx Assistant lists, adds and pauses torrents through this (primary instance only).
+    app.connect_startup(|app| nyx_core::control::serve(app, control::tools(), control::handle));
     app.connect_command_line(|app, cl| {
         let argv: Vec<String> = cl.arguments().iter().map(|a| a.to_string_lossy().to_string()).collect();
         if argv.iter().any(|a| a == "--quit") {

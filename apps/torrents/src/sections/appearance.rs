@@ -3,7 +3,7 @@ use crate::{cmd, live, prefs, theme, window};
 use gtk::glib;
 use gtk::prelude::*;
 
-const DESKTOP: &str = "io.github.design_nexus.nixe.Torrents.desktop";
+const DESKTOP: &str = "io.github.design_nexus.nyx.Torrents.desktop";
 
 fn is_default() -> bool {
     cmd::output(&["xdg-mime", "query", "default", "x-scheme-handler/magnet"]).is_some_and(|v| v.trim() == DESKTOP)
@@ -12,7 +12,7 @@ fn is_default() -> bool {
 pub fn build(page: &Page) {
     // ----- This window -----
     let g = page.group("This window");
-    g.add(&nixe_ui::widgets::start_row());
+    g.add(&nyx_ui::widgets::start_row());
     let p = prefs::get();
     let app_themes = theme::all();
     let options: Vec<(String, String)> = app_themes.iter().map(|t| (t.id.clone(), t.name.clone())).collect();

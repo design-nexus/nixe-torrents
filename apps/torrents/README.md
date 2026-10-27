@@ -35,11 +35,11 @@ your Omarchy theme and fits a half-screen tile.
 ## Install
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/design-nexus/nixe-torrents/main/install.sh | bash -s -- torrents
+curl -fsSL https://raw.githubusercontent.com/design-nexus/nyx-torrents/main/install.sh | bash -s -- torrents
 ```
 
 This installs any missing build dependencies (`rust gtk4 libtorrent-rasterbar boost`),
-builds the app, and puts `nixe-torrents` in `~/.local/bin` with a launcher entry. Add
+builds the app, and puts `nyx-torrents` in `~/.local/bin` with a launcher entry. Add
 `-s -- --default` after `bash` to also open magnet links and `.torrent` files with it.
 Search plugins need `python3`, and adding links to `.torrent` files needs `curl`.
 
@@ -49,10 +49,10 @@ To remove it, run the same line with `uninstall.sh` in place of `install.sh`. Ad
 ## Use
 
 ```sh
-nixe-torrents                           # open the window, or bring it to the front
-nixe-torrents file.torrent 'magnet:?…'  # add torrents to the open window
-nixe-torrents --section search          # go straight to a page
-nixe-torrents --quit                    # save and stop
+nyx-torrents                           # open the window, or bring it to the front
+nyx-torrents file.torrent 'magnet:?…'  # add torrents to the open window
+nyx-torrents --section search          # go straight to a page
+nyx-torrents --quit                    # save and stop
 ```
 
 Closing the window quits Torrents. To keep downloading in the background instead,

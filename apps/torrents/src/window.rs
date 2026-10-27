@@ -10,7 +10,7 @@ use crate::sections::{self, Section, transfers};
 use crate::widgets;
 use crate::{actions, fmt, live, prefs, settings_dialog, store, theme};
 use gtk::prelude::*;
-use nixe_ui::chrome;
+use nyx_ui::chrome;
 use gtk::{gdk, gio, glib};
 use std::cell::RefCell;
 use std::collections::HashMap;
@@ -61,7 +61,7 @@ pub fn present(app: &gtk::Application, section: Option<&str>) {
     live::start();
     actions::install(app);
     build(app);
-    let start = section.map(String::from).unwrap_or_else(|| nixe_theme::start_page("all", &prefs::get().last_section));
+    let start = section.map(String::from).unwrap_or_else(|| nyx_theme::start_page("all", &prefs::get().last_section));
     navigate(&start);
     // Developer aid: TORRENTS_SNAPSHOT=/path.png renders the window to a PNG
     // (invisibly) and quits, so layouts can be checked without a visible window.
@@ -137,8 +137,8 @@ fn build(app: &gtk::Application) {
     window.add_css_class("torrents-window");
     // No client-side titlebar: Hyprland manages the window.
     window.set_titlebar(Some(&gtk::Box::new(gtk::Orientation::Horizontal, 0)));
-    nixe_ui::keys::install(&window, nixe_ui::keys::Common { settings: Some(|| settings_dialog::open(None)), shortcuts: Some(show_shortcuts), close: false, palette: None });
-    window.set_icon_name(Some("io.github.design_nexus.nixe.Torrents"));
+    nyx_ui::keys::install(&window, nyx_ui::keys::Common { settings: Some(|| settings_dialog::open(None)), shortcuts: Some(show_shortcuts), close: false, palette: None });
+    window.set_icon_name(Some("io.github.design_nexus.nyx.Torrents"));
 
     let sections = sections::all();
 
@@ -785,7 +785,7 @@ pub fn navigate(id: &str) {
 /// Show a short message at the bottom of the window.
 pub fn toast(message: &str) {
     let Some(ui) = ui() else {
-        eprintln!("nixe-torrents: {message}");
+        eprintln!("nyx-torrents: {message}");
         return;
     };
     let overlay = ui.borrow().overlay.clone();
@@ -817,7 +817,7 @@ pub fn notify(title: &str, body: &str) {
     }
     let n = gio::Notification::new(title);
     n.set_body(Some(body));
-    n.set_icon(&gio::ThemedIcon::new("io.github.design_nexus.nixe.Torrents"));
+    n.set_icon(&gio::ThemedIcon::new("io.github.design_nexus.nyx.Torrents"));
     app.send_notification(None, &n);
 }
 
