@@ -500,10 +500,6 @@ pub fn build(page: &Page) {
         }
     });
     reload_engines();
-    // Developer aid: TORRENTS_SNAPSHOT_SEARCH="words" runs a search once the plugins are read.
-    if let Ok(q) = std::env::var("TORRENTS_SNAPSHOT_SEARCH") {
-        glib::timeout_add_local_once(std::time::Duration::from_millis(1500), move || start(&q, "all"));
-    }
 }
 
 /// Put the cursor in the search field.

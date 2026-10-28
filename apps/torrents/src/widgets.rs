@@ -189,7 +189,7 @@ pub fn graph_card(title: &str, graph: &impl IsA<gtk::Widget>) -> (gtk::Box, gtk:
     t.set_hexpand(true);
     t.set_ellipsize(pango::EllipsizeMode::End);
     let summary = label("", "dim");
-    summary.add_css_class("mono");
+    summary.add_css_class("tnum");
     summary.set_xalign(1.0);
     head.append(&t);
     head.append(&summary);
@@ -216,14 +216,14 @@ pub fn spin_row(
     let spin = gtk::SpinButton::with_range(range.0, range.1, step);
     spin.set_digits(digits);
     spin.set_value(value);
-    spin.add_css_class("mono");
+    spin.add_css_class("tnum");
     spin.set_valign(gtk::Align::Center);
     spin.connect_value_changed(move |s| on_change(s.value()));
     let bx = hbox(8);
     bx.append(&spin);
     if !unit.is_empty() {
         let u = label(unit, "dim");
-        u.add_css_class("mono");
+        u.add_css_class("tnum");
         u.set_width_chars(6);
         bx.append(&u);
     }

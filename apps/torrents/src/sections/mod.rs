@@ -112,7 +112,7 @@ pub fn all() -> Vec<Section> {
             icon: "applications-graphics-symbolic",
             group: "Settings",
             description: "How this window looks and behaves.",
-            keywords: "theme colours colors omarchy glow motion background notifications keyboard shortcuts",
+            keywords: "theme colours colors omarchy accent motion background notifications keyboard shortcuts",
             files: settings_file,
             build: appearance::build,
             fill: false,

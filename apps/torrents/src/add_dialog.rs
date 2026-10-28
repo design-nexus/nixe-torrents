@@ -162,7 +162,7 @@ pub fn show(source: Source) {
     name_label.set_wrap_mode(gtk::pango::WrapMode::WordChar);
     card.append(&name_label);
     let summary = widgets::label("", "dim");
-    summary.add_css_class("mono");
+    summary.add_css_class("tnum");
     card.append(&summary);
 
     // ----- Where -----

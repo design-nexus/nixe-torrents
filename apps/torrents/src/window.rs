@@ -1,9 +1,9 @@
-//! The main window: a top bar (sidebar toggle, where you are, search,
-//! settings, close), the navigation sidebar (transfer filters with live counts,
-//! categories, tags, then Search), a stack of pages built the first time
-//! they're shown, and a status bar with the overall speeds. Every transfer
-//! filter shows the same Transfers page. The settings pages open in the
-//! settings dialog instead (see `settings_dialog`).
+//! The main window: the header (the app and where you are, the sidebar toggle; the
+//! overall speeds and connection, the slow-mode chip, search and settings at the end),
+//! the navigation sidebar (transfer filters with live counts, categories, tags, then
+//! Search) and a stack of pages built the first time they're shown. Every transfer
+//! filter shows the same Transfers page. The settings pages open in the settings
+//! dialog instead (see `settings_dialog`).
 
 use crate::model::{Filter, STATUS_FILTERS};
 use crate::sections::{self, Section, transfers};
@@ -31,6 +31,9 @@ struct Ui {
     overlay: gtk::Overlay,
     compact_hide: Vec<gtk::Widget>,
     nav: gtk::Box,
+    header: chrome::AppHeader,
+    /// The speeds and connection, at the header's end.
+    readout: gtk::Label,
 }
 
 thread_local! {
@@ -63,12 +66,6 @@ pub fn present(app: &gtk::Application, section: Option<&str>) {
     build(app);
     let start = section.map(String::from).unwrap_or_else(|| nyx_theme::start_page("all", &prefs::get().last_section));
     navigate(&start);
-    // Developer aid: TORRENTS_SNAPSHOT=/path.png renders the window to a PNG
-    // (invisibly) and quits, so layouts can be checked without a visible window.
-    if let Some(out) = std::env::var_os("TORRENTS_SNAPSHOT") {
-        snapshot_and_quit(app, std::path::PathBuf::from(out));
-        return;
-    }
     if let Some(ui) = ui() {
         ui.borrow().window.present();
     }
@@ -103,7 +100,7 @@ fn nav_button(id: &str, title: &str, icon: &str, tooltip: &str, count: bool) -> 
     content.append(&l);
     let readout = count.then(|| {
         let r = widgets::label("", "nav-readout");
-        r.add_css_class("mono");
+        r.add_css_class("tnum");
         content.append(&r);
         r
     });
@@ -133,7 +130,7 @@ fn group_heading(title: &str, add: Option<(&str, fn())>) -> (gtk::Box, gtk::Labe
 
 fn build(app: &gtk::Application) {
     let window =
-        gtk::ApplicationWindow::builder().application(app).title("Torrents").default_width(1120).default_height(800).build();
+        gtk::ApplicationWindow::builder().application(app).title("Torrents").default_width(1280).default_height(800).build();
     window.add_css_class("torrents-window");
     // No client-side titlebar: Hyprland manages the window.
     window.set_titlebar(Some(&gtk::Box::new(gtk::Orientation::Horizontal, 0)));
@@ -198,12 +195,6 @@ fn build(app: &gtk::Application) {
         .vexpand(true)
         .child(&list)
         .build();
-    let head = chrome::sidebar_head("Torrents", Some("Filter the list (Ctrl+F)"));
-    head.toggle.connect_clicked(|_| toggle_sidebar());
-    if let Some(find_button) = &head.search {
-        find_button.connect_clicked(|_| find());
-    }
-    nav.append(&head.root);
     nav.append(&nav_scroll);
 
     // ----- Content -----
@@ -218,10 +209,26 @@ fn build(app: &gtk::Application) {
     body.append(&nav);
     body.append(&stack);
 
+    // ----- Header -----
+    // The app and where you are, the sidebar toggle; the speeds and connection, the
+    // slow-mode chip, search and Settings at the end.
+    let header = chrome::app_header(&window, "torrents-magnet-symbolic", "Torrents");
+    let collapse = widgets::bar_button("sidebar-show-symbolic", "Collapse the sidebar (Ctrl+B)");
+    collapse.connect_clicked(|_| toggle_sidebar());
+    header.start.append(&collapse);
+    header.end.set_spacing(4);
+    let readout = header_readout();
+    header.end.append(&readout);
+    header.end.append(&alt_speed_chip());
+    let search = widgets::bar_button("system-search-symbolic", "Filter the list (Ctrl+F)");
+    search.connect_clicked(|_| find());
+    header.end.append(&search);
+    header.end.append(&chrome::settings_button(|| settings_dialog::open(None)));
+
     let frame = gtk::Box::new(gtk::Orientation::Vertical, 0);
     frame.add_css_class("window-frame");
+    frame.append(&header.root);
     frame.append(&body);
-    frame.append(&status_bar());
 
     let overlay = gtk::Overlay::new();
     overlay.set_child(Some(&frame));
@@ -381,6 +388,8 @@ fn build(app: &gtk::Application) {
         overlay,
         compact_hide,
         nav: nav.clone(),
+        header,
+        readout,
     };
     UI.with(|u| *u.borrow_mut() = Some(Rc::new(RefCell::new(ui))));
     rebuild_lists();
@@ -543,27 +552,11 @@ fn find() {
     }
 }
 
-/// The bar along the bottom: the shortcuts on the left; the overall speeds,
-/// the alternative-speed switch and the connection on the right.
-fn status_bar() -> gtk::Box {
-    let bar = widgets::hbox(16);
-    bar.add_css_class("status-bar");
-    let help = gtk::Button::new();
-    help.add_css_class("status-help");
-    let content = widgets::hbox(10);
-    content.append(&widgets::label("F1", "status-key"));
-    content.append(&widgets::label("Shortcuts", ""));
-    help.set_child(Some(&content));
-    help.set_tooltip_text(Some("Show the keyboard shortcuts"));
-    help.connect_clicked(|_| show_shortcuts());
-    bar.append(&help);
-    let spacer = widgets::hbox(0);
-    spacer.set_hexpand(true);
-    bar.append(&spacer);
-    let readout = widgets::label("", "status-readout");
+/// The overall speeds and the connection, kept current.
+fn header_readout() -> gtk::Label {
+    let readout = widgets::label("", "header-status");
     readout.set_ellipsize(gtk::pango::EllipsizeMode::Start);
-    bar.append(&readout);
-    bar.append(&alt_speed_chip());
+    readout.set_margin_end(6);
     let r = readout.clone();
     live::on_tick(&readout, move |u| {
         let mut parts = vec![
@@ -584,8 +577,7 @@ fn status_bar() -> gtk::Box {
             "Not listening: check the port and network interface in Connection."
         }));
     });
-    bar.append(&chrome::gear(|| settings_dialog::open(None)));
-    bar
+    readout
 }
 
 /// Every keyboard shortcut, for the shortcuts dialog and Appearance.
@@ -647,6 +639,8 @@ fn set_narrow(narrow: bool) {
         mark_page(&page, narrow);
     }
     transfers::set_narrow(narrow);
+    // A tiled half-screen header has no room for the speeds.
+    ui.borrow().readout.set_visible(!narrow);
 }
 
 /// The sidebar shows only icons: hide the labels, centre the icons and the toggle.
@@ -664,9 +658,6 @@ fn apply_compact(compact: bool) {
     }
     for w in hide {
         w.set_visible(!compact);
-    }
-    if let Some(head) = nav.first_child().and_downcast::<gtk::Box>() {
-        chrome::set_head_compact(&head, compact);
     }
     centre_icons(nav.upcast_ref(), compact);
 }
@@ -776,6 +767,7 @@ pub fn navigate(id: &str) {
             crumb = u.sections.iter().find(|s| s.id == page_id).map(|s| s.title.to_string()).unwrap_or_default();
         }
         chrome::set_title(&u.window, "Torrents", &crumb);
+        u.header.set_subtitle(&crumb);
         u.stack.set_visible_child_name(page_id);
         u.current = nav_id.clone();
     }
@@ -819,64 +811,4 @@ pub fn notify(title: &str, body: &str) {
     n.set_body(Some(body));
     n.set_icon(&gio::ThemedIcon::new("io.github.design_nexus.nyx.Torrents"));
     app.send_notification(None, &n);
-}
-
-fn snapshot_and_quit(app: &gtk::Application, out: std::path::PathBuf) {
-    let Some(ui) = ui() else { return };
-    let window = ui.borrow().window.clone();
-    window.set_opacity(0.01);
-    // A distinct title lets a window rule float it at a set size for screenshots.
-    window.set_title(Some("Torrents snapshot"));
-    let env = |k: &str, d: i32| std::env::var(k).ok().and_then(|v| v.parse().ok()).unwrap_or(d);
-    window.set_default_size(env("TORRENTS_SNAPSHOT_W", 1120), env("TORRENTS_SNAPSHOT_H", 820));
-    // A fixed-size window floats in Hyprland, so the snapshot gets the size asked for
-    // instead of whatever tile is free.
-    window.set_resizable(false);
-    window.present();
-    let app = app.clone();
-    let delay = env("TORRENTS_SNAPSHOT_DELAY", 2500) as u64;
-    // TORRENTS_SNAPSHOT_SELECT=1 selects the first torrent, to show the details pane.
-    if std::env::var_os("TORRENTS_SNAPSHOT_SELECT").is_some() {
-        glib::timeout_add_local_once(std::time::Duration::from_millis(delay / 2), transfers::select_first);
-    }
-    glib::timeout_add_local_once(std::time::Duration::from_millis(delay), move || {
-        // TORRENTS_SNAPSHOT_PAGE=1 renders the whole current page, not just what fits.
-        // TORRENTS_SNAPSHOT_DIALOG=1 renders the open dialog instead of the main window.
-        let dialog = std::env::var_os("TORRENTS_SNAPSHOT_DIALOG").is_some().then(|| {
-            gtk::Window::list_toplevels()
-                .into_iter()
-                .filter_map(|w| w.downcast::<gtk::Window>().ok())
-                .find(|w| w.is_visible() && w.upcast_ref::<gtk::Widget>() != window.upcast_ref::<gtk::Widget>())
-                .and_then(|w| w.child())
-        });
-        let target = if let Some(d) = dialog {
-            d
-        } else if std::env::var_os("TORRENTS_SNAPSHOT_PAGE").is_some() {
-            UI.with(|cell| cell.borrow().clone()).and_then(|u| {
-                let u = u.borrow();
-                let page = if Filter::from_id(&u.current).is_some() { "transfers" } else { u.current.as_str() };
-                u.pages.iter().find(|(k, _)| **k == page).and_then(|(_, p)| p.child()).and_then(|v| v.first_child())
-            })
-        } else {
-            window.child()
-        };
-        if let Some(child) = target {
-            let paintable = gtk::WidgetPaintable::new(Some(&child));
-            let (w, h) = (child.width(), child.height());
-            let snapshot = gtk::Snapshot::new();
-            snapshot.append_color(&gdk::RGBA::BLACK, &gtk::graphene::Rect::new(0.0, 0.0, w as f32, h as f32));
-            paintable.snapshot(&snapshot, w as f64, h as f64);
-            if let (Some(node), Some(renderer)) = (snapshot.to_node(), window.renderer()) {
-                let texture = renderer.render_texture(node, None);
-                match texture.save_to_png(&out) {
-                    Ok(()) => {
-                        let (min, _, _, _) = window.measure(gtk::Orientation::Horizontal, -1);
-                        println!("snapshot {w}x{h} (window needs at least {min} px) -> {}", out.display())
-                    }
-                    Err(e) => eprintln!("snapshot failed: {e}"),
-                }
-            }
-        }
-        app.quit();
-    });
 }

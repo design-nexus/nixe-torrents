@@ -44,12 +44,11 @@ fn main() -> glib::ExitCode {
     }
     glib::set_application_name("Torrents");
 
-    let mut flags = gio::ApplicationFlags::HANDLES_COMMAND_LINE;
-    // Snapshots run beside a real instance instead of handing it their arguments.
-    if std::env::var_os("TORRENTS_SNAPSHOT").is_some() {
-        flags |= gio::ApplicationFlags::NON_UNIQUE;
-    }
-    let app = gtk::Application::builder().application_id(APP_ID).flags(flags).build();
+    let flags = gio::ApplicationFlags::HANDLES_COMMAND_LINE;
+    // Developer aid: a different id gives a separate instance (a test copy on a virtual
+    // monitor), so it doesn't hand its arguments to the copy that's open.
+    let id = std::env::var("NYX_TORRENTS_APP_ID").unwrap_or_else(|_| APP_ID.to_string());
+    let app = gtk::Application::builder().application_id(id).flags(flags).build();
     // Nyx Assistant lists, adds and pauses torrents through this (primary instance only).
     app.connect_startup(|app| nyx_core::control::serve(app, control::tools(), control::handle));
     app.connect_command_line(|app, cl| {

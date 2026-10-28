@@ -1,19 +1,116 @@
+/* Torrents on Nyx 2.0: only Torrents' own parts. One surface: the header, the
+   sidebar, toolbars, the table and the details share the window's background;
+   cards and spacing, not lines, separate them. Buttons, chips, inputs, switches,
+   rows, table headers and banners come from the shared sheets. */
+
+/* ---------- Header ---------- */
+
+.header-status {
+  font-size: 11.5px;
+  color: @theme_dim_text;
+  font-feature-settings: "tnum";
+}
+
+window.torrents-window .app-header button.bar-button,
+window.torrents-window .app-header menubutton.bar-button > button {
+  min-width: 32px;
+  min-height: 32px;
+  padding: 0;
+  border-radius: var(--nyx-radius-small);
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+  color: @theme_dim_text;
+}
+
+window.torrents-window .app-header button.bar-button:hover,
+window.torrents-window .app-header menubutton.bar-button > button:hover {
+  background: @row_hover;
+  color: @theme_text;
+}
+
+/* Slow mode: a quiet chip that takes the accent while it's on. */
+window.torrents-window button.alt-chip {
+  min-height: 26px;
+  padding: 0 10px;
+  margin-right: 4px;
+  background: transparent;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: @theme_dim_text;
+}
+
+window.torrents-window button.alt-chip:hover {
+  background: @row_hover;
+  color: @theme_text;
+}
+
+window.torrents-window button.alt-chip.selected {
+  background: @nav_active;
+  color: @theme_accent;
+}
+
+/* Numbers that line up. */
+.tnum {
+  font-feature-settings: "tnum";
+}
+
+/* ---------- Sidebar ---------- */
+
+.settings-navigation .nav-group {
+  font-size: 11px;
+}
+
+/* A group heading with a + button. */
+.settings-navigation .nav-group-row {
+  margin: 14px 0 4px;
+}
+
+.settings-navigation .nav-group-row.first {
+  margin-top: 0;
+}
+
+.settings-navigation .nav-group-row .nav-group {
+  margin: 0;
+}
+
+window.torrents-window button.nav-add {
+  min-height: 22px;
+  min-width: 22px;
+  padding: 0;
+  margin-right: 4px;
+  border-radius: var(--nyx-radius-small);
+  background: transparent;
+  color: @theme_dim_text;
+}
+
+window.torrents-window button.nav-add:hover {
+  background: @row_hover;
+  color: @theme_text;
+}
+
+/* The icon-only sidebar hides these labels itself. The shared sheet's font-size: 0
+   for them can stick after the sidebar expands again, so they keep their size. */
+.settings-navigation.compact .nav-group {
+  font-size: 11px;
+}
+
 /* ---------- Graphs ---------- */
 
 .graph-card {
-  background: mix(@theme_bg, @theme_muted, 0.25);
-  border: 1px solid @hairline;
-  border-radius: 6px;
+  background: @theme_card;
+  border: none;
+  border-radius: var(--nyx-radius-card);
   padding: 14px 16px;
 }
 
 .graph-card-title {
-  font-weight: 700;
+  font-weight: 600;
   color: @theme_text;
 }
 
 .graph-legend {
-  font-size: 0.86em;
+  font-size: 12px;
 }
 
 .legend-label {
@@ -22,7 +119,7 @@
 
 .legend-value {
   color: @theme_text;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .legend-swatch {
@@ -42,157 +139,134 @@
 }
 
 .graph-plot {
-  background: alpha(@theme_bg, 0.35);
-  border-radius: 4px;
+  background: @field;
+  border-radius: var(--nyx-radius-small);
 }
 
 .graph-axis {
-  font-size: 0.72em;
-  color: @theme_dim_text;
+  font-size: 11px;
+  color: @theme_text_tertiary;
 }
 
 .graph-plot .graph-axis {
   margin: 3px 6px;
-  color: alpha(@theme_dim_text, 0.9);
 }
 
 .graph-tip {
-  font-size: 0.8em;
+  font-size: 12px;
   padding: 5px 9px;
-  border-radius: 6px;
-  background: @theme_surface;
-  border: 1px solid alpha(@theme_border, 0.8);
-  box-shadow: 0 4px 16px alpha(@theme_shadow, 0.5);
+  border-radius: var(--nyx-radius-small);
+  background: @theme_popover;
+  box-shadow: 0 6px 20px alpha(@theme_shadow, 0.45);
   color: @theme_text;
 }
 
 /* ---------- Key figures ---------- */
 
 .kv-key {
-  font-size: 0.78em;
-  font-weight: 700;
+  font-size: 11.5px;
   color: @theme_dim_text;
 }
 
-.kv-value {
-  font-size: 1.05em;
-  font-weight: 700;
+/* The shared figure is mono; here it's the UI font with tabular figures. */
+window.torrents-window label.kv-value.mono {
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
   color: @theme_text;
+  font-feature-settings: "tnum";
 }
 
-/* A page's toolbar sits on a hairline above its table. */
+/* ---------- Toolbars ---------- */
+
+/* A page's toolbar, above its table. */
 .toolbar {
-  min-height: 46px;
+  min-height: 44px;
   margin: 0;
   background: transparent;
-  padding: 0 12px 0 14px;
-  border-bottom: 1px solid @hairline;
-}
-
-window.torrents-window columnview > header > button,
-window.torrents-window columnview > header > button > box > label {
-  font-size: 1em;
-  font-weight: 700;
-}
-
-.cell-num {
-  font-family: "JetBrains Mono", "JetBrainsMono Nerd Font", monospace;
-  font-feature-settings: "tnum";
-  font-size: 0.92em;
-}
-
-.details-title {
-  font-size: 1.1em;
-  font-weight: 800;
-}
-
-window.torrents-window .segmented > button {
-  min-height: 28px;
-  padding: 0 12px;
-  border-radius: 5px;
-  border: none;
-  background: transparent;
-  font-weight: 600;
-  color: @theme_dim_text;
-}
-
-window.torrents-window .segmented > button:hover {
-  background: @row_hover;
-  color: @theme_text;
-}
-
-window.torrents-window .segmented > button.selected {
-  background: @nav_active;
-  color: @theme_text;
-}
-
-/* Toolbar */
-
-window.torrents-window button.tool-button {
-  min-width: 32px;
-  padding: 0 6px;
-  border-color: transparent;
-  color: @theme_dim_text;
-}
-
-window.torrents-window button.tool-button:hover {
-  color: @theme_text;
+  padding: 0 16px 0 20px;
 }
 
 .toolbar separator {
   margin: 12px 4px;
-  background: alpha(@theme_border, 0.7);
-  min-width: 1px;
+  background: transparent;
+  min-width: 6px;
 }
 
-/* Sidebar extras */
-
-/* A group heading with a + button: the row carries the hairline. */
-.settings-navigation .nav-group-row {
-  margin: 10px -6px 4px;
-  padding: 10px 12px 0 0;
-  border-top: 1px solid @hairline;
-}
-
-.settings-navigation .nav-group-row.first {
-  margin-top: 0;
-  padding-top: 0;
-  border-top: none;
-}
-
-.settings-navigation .nav-group-row .nav-group {
-  margin: 0;
-  border-top: none;
-}
-
-.settings-navigation .nav-group-row.first .nav-group {
-  padding-top: 6px;
-}
-
-window.torrents-window button.nav-add {
-  min-height: 22px;
-  min-width: 22px;
-  padding: 0;
-  margin: 10px 0 0 0;
-  border-radius: 999px;
+window.torrents-window button.tool-button {
+  min-width: 32px;
+  min-height: 32px;
+  padding: 0 6px;
+  background: transparent;
   color: @theme_dim_text;
 }
 
-window.torrents-window button.alt-chip {
-  min-height: 22px;
-  padding: 0 8px;
-  border-color: transparent;
-  font-size: 1em;
+window.torrents-window button.tool-button:hover {
+  background: @row_hover;
+  color: @theme_text;
+}
+
+/* A segmented filter: a field track, the selected segment raised. */
+window.torrents-window .segmented {
+  padding: 2px;
+  border-radius: var(--nyx-radius-small);
+  background: @field;
+}
+
+window.torrents-window .segmented > button {
+  min-height: 26px;
+  padding: 0 12px;
+  border-radius: 5px;
+  border: none;
+  background: transparent;
   font-weight: 500;
   color: @theme_dim_text;
 }
 
-window.torrents-window button.alt-chip.selected {
-  background: @nav_active;
-  color: @theme_accent;
+window.torrents-window .segmented > button:hover {
+  color: @theme_text;
 }
 
-/* Torrent table */
+window.torrents-window .segmented > button.selected {
+  background: @theme_raised;
+  box-shadow: 0 1px 3px alpha(@theme_shadow, 0.3);
+  color: @theme_text;
+}
+
+entry.table-search,
+window.torrents-window searchentry {
+  min-height: 32px;
+}
+
+.search-sub {
+  min-height: 40px;
+  padding: 0 16px 0 20px;
+}
+
+/* ---------- The torrent table ---------- */
+
+window.torrents-window columnview > header > button {
+  min-height: 32px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+}
+
+window.torrents-window columnview > header > button > box > label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: @theme_text_tertiary;
+}
+
+window.torrents-window columnview > header > button:hover > box > label {
+  color: @theme_text;
+}
+
+.cell-num {
+  font-feature-settings: "tnum";
+}
 
 .cell-icon {
   color: @theme_dim_text;
@@ -214,7 +288,7 @@ window.torrents-window progressbar.cell-progress > trough {
   min-height: 6px;
   min-width: 40px;
   border-radius: 999px;
-  background: alpha(@theme_muted, 0.8);
+  background: @track;
   border: none;
 }
 
@@ -233,16 +307,18 @@ window.torrents-window columnview > listview > row:selected .cell-icon {
   color: @theme_accent;
 }
 
-entry.table-search,
-window.torrents-window searchentry {
-  min-height: 32px;
+window.torrents-window dropdown.cell-choice > button {
+  min-width: 100px;
+  min-height: 26px;
+  padding: 0 8px;
 }
 
-/* Details pane */
+/* ---------- Details pane ---------- */
 
-.transfers-paned > separator {
-  min-height: 1px;
-  background: @hairline;
+/* Blended: the table and the details meet without a line (the divider still drags). */
+window.torrents-window paned.transfers-paned > separator {
+  min-height: 6px;
+  background: @theme_bg;
 }
 
 .details-pane {
@@ -251,12 +327,11 @@ window.torrents-window searchentry {
 
 .details-head {
   padding: 8px 10px 8px 16px;
-  border-bottom: 1px solid alpha(@theme_border, 0.45);
 }
 
 .details-title {
-  font-size: 1em;
-  font-weight: 800;
+  font-size: 15px;
+  font-weight: 600;
 }
 
 .details-general {
@@ -269,7 +344,8 @@ window.torrents-window searchentry {
 
 .fact-row .fact-value {
   color: @theme_text;
-  font-size: 0.92em;
+  font-size: 12.5px;
+  font-feature-settings: "tnum";
 }
 
 .details-table > listview > row > cell,
@@ -285,138 +361,23 @@ window.torrents-window .details-pane columnview > header > button {
   padding: 12px 16px;
 }
 
-window.torrents-window dropdown.cell-choice > button {
-  min-width: 100px;
-  min-height: 26px;
-  padding: 0 8px;
+.details-add-row {
+  margin: 0 10px 10px;
 }
 
-/* Add dialog */
+/* ---------- Dialogs ---------- */
 
 .add-name {
-  font-size: 1.08em;
-  font-weight: 700;
+  font-size: 15px;
+  font-weight: 600;
 }
 
 .add-form {
   margin-top: 6px;
 }
 
-.search-sub {
-  min-height: 40px;
-  padding: 0 12px 0 14px;
-  border-bottom: 1px solid @hairline;
-}
-
-window.torrents-window checkbutton {
-  color: @theme_text;
-}
-
-window.torrents-window checkbutton check {
-  border-radius: 4px;
-  border: 1px solid alpha(@theme_border, 0.9);
-  background: alpha(@theme_bg, 0.65);
-}
-
-window.torrents-window checkbutton check:checked {
-  background: @theme_accent;
-  border-color: @theme_accent;
-  color: @theme_on_accent;
-}
-
 window.torrents-window textview.code-block {
-  border: 1px solid alpha(@theme_border, 0.8);
-}
-
-.details-add-row {
-  margin: 0 10px 10px;
-}
-
-window.torrents-window button.bar-button {
-  min-width: 30px;
-  min-height: 30px;
-  padding: 0;
-  border-radius: 6px;
-  border-color: transparent;
-  background: transparent;
-  color: @theme_dim_text;
-}
-
-window.torrents-window button.bar-button:hover {
-  background: @row_hover;
-  color: @theme_text;
-}
-
-/* A config-file menu in the top bar looks like the other bar buttons. */
-window.torrents-window menubutton.bar-button > button {
-  min-width: 30px;
-  min-height: 30px;
-  padding: 0;
-  border-radius: 6px;
-  border-color: transparent;
-  background: transparent;
-  color: @theme_dim_text;
-}
-
-window.torrents-window menubutton.bar-button > button:hover {
-  background: @row_hover;
-  color: @theme_text;
-}
-
-window.torrents-window entry.bar-search {
-  min-height: 30px;
-  margin-right: 4px;
-}
-
-window.torrents-window button.status-help {
-  min-height: 24px;
-  padding: 0 6px;
   border: none;
-  background: transparent;
-  color: @theme_dim_text;
-  font-weight: 500;
-}
-
-window.torrents-window button.status-help:hover {
-  color: @theme_text;
-}
-
-.settings-navigation .nav-group.first {
-  margin-top: 0;
-  padding-top: 6px;
-  border-top: none;
-}
-
-.settings-navigation.compact .nav-group {
-  margin: 8px -6px;
-  padding: 0;
-  min-height: 0;
-  font-size: 0;
-}
-
-.settings-navigation.compact .nav-group.first {
-  border-top: none;
-  margin: 0;
-}
-
-window.torrents-window columnview > header,
-window.torrents-window columnview > header > button,
-window.torrents-window columnview > header > button > box {
-  font-size: 1em;
-}
-
-window.torrents-window button.dialog-nav {
-  min-height: 0;
-  padding: 10px 14px;
-  border: none;
-  border-radius: 6px;
-  background: transparent;
-}
-
-window.torrents-window button.dialog-nav:hover {
-  background: @row_hover;
-}
-
-window.torrents-window button.dialog-nav.active {
-  background: @lift_active;
+  border-radius: var(--nyx-radius-small);
+  background: @theme_card;
 }

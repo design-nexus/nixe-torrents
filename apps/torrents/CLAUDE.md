@@ -1,9 +1,11 @@
 # Torrents — notes for working on this repo
 
-- GTK4 (gtk4-rs 0.11) + Rust, no libadwaita. The window is one flat, monospace surface
-  split by hairlines (see `STYLE.md`): the sidebar (its head holds the toggle and the
-  filter search), the page and a status bar (`F1 Shortcuts`, speeds, port, DHT, free
-  space, the slow-mode turtle, settings). Pages have no title header. The settings pages
+- GTK4 (gtk4-rs 0.11) + Rust, no libadwaita. Nyx Design 2.0 (`use_design_2`, see
+  `STYLE.md`): one surface, no hairlines; cards and spacing separate the parts. The
+  unified header (`chrome::app_header`) has the app with the filter or page as its
+  subtitle and the sidebar toggle; speeds, port, DHT and free space, the slow-mode chip,
+  search and Settings at the end. No status bar, no sidebar head. Numbers use tabular
+  figures (`tnum`); mono is for links, paths and hashes. Pages have no title header. The settings pages
   (group `Settings` in `sections::all`) open in `settings_dialog.rs`, a card over the
   window with its own search over `widgets::SEARCH`; `navigate("speed")` etc. open it.
   The theme, widgets, settings card and window frame come from the `nyx-*` crates.
@@ -30,10 +32,7 @@
 - Control (`src/control.rs`): `nyx_core::control` on the app's bus name, for Nyx Assistant: `torrents.list`, `add` (links only), `pause`, `resume`.
 - Checks: `cargo clippy --all-targets -- -D warnings`, `cargo test`, and
   `cargo test -- --ignored` (seeds a file between two local sessions over 127.0.0.1:46881–2).
-- Visual check with a scratch profile (quit any running instance first; it's single-instance):
-  `XDG_CONFIG_HOME=/tmp/c XDG_DATA_HOME=/tmp/d TORRENTS_SNAPSHOT=/tmp/x.png torrents --section speed`.
-  - `TORRENTS_SNAPSHOT_PAGE=1` renders the whole page.
-  - `TORRENTS_SNAPSHOT_SELECT=1` selects the first torrent.
-  - `TORRENTS_SNAPSHOT_DIALOG=1` renders an open dialog.
-  - `TORRENTS_SNAPSHOT_SEARCH=words` runs a search.
-  - `TORRENTS_SNAPSHOT_DELAY=ms` waits before rendering.
+- Visual check: a test copy on a private virtual monitor with a scratch profile,
+  `NYX_TORRENTS_APP_ID=io.github.design_nexus.nyx.TorrentsTest XDG_CONFIG_HOME=/tmp/c
+  XDG_DATA_HOME=/tmp/d nyx-torrents --section speed` (a separate instance, so the open copy
+  is untouched).

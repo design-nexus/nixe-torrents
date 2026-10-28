@@ -948,13 +948,3 @@ pub fn build(page: &Page) {
         update(&u);
     }
 }
-
-/// Select the first row (developer aid for snapshots).
-pub fn select_first() {
-    if let Some(st) = state() {
-        let sel = st.borrow().selection.clone();
-        if sel.n_items() > 0 {
-            sel.select_item(0, true);
-        }
-    }
-}

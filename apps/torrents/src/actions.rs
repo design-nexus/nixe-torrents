@@ -547,7 +547,7 @@ fn limits_dialog(ids: Vec<String>) {
     let spin = |v: i32| {
         let s = gtk::SpinButton::with_range(0.0, 1_000_000.0, 64.0);
         s.set_value(v as f64);
-        s.add_css_class("mono");
+        s.add_css_class("tnum");
         s
     };
     let down = spin(dl);
