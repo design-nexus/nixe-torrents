@@ -1,6 +1,5 @@
 use crate::widgets::{self, Page};
-use crate::{cmd, live, prefs, theme, window};
-use gtk::glib;
+use crate::{cmd, live, prefs, window};
 use gtk::prelude::*;
 
 const DESKTOP: &str = "io.github.design_nexus.nyx.Torrents.desktop";
@@ -10,86 +9,7 @@ fn is_default() -> bool {
 }
 
 pub fn build(page: &Page) {
-    // ----- This window -----
-    let g = page.group("This window");
-    g.add(&nyx_ui::widgets::start_row());
     let p = prefs::get();
-    let app_themes = theme::all();
-    let options: Vec<(String, String)> = app_themes.iter().map(|t| (t.id.clone(), t.name.clone())).collect();
-    let (theme_row, theme_dd) = widgets::choice_row(
-        "Theme",
-        "Dracula, Catppuccin, Tokyo Night, One Dark Pro and more. Add your own in <tt>~/.config/torrents/themes</tt>.",
-        options,
-        &p.theme,
-        |id| {
-            prefs::update(|p| {
-                p.theme = id;
-                p.mode = prefs::ThemeMode::Theme;
-            });
-            theme::apply();
-        },
-    );
-    theme_dd.set_sensitive(p.mode == prefs::ThemeMode::Theme || !theme::omarchy_available());
-
-    if theme::omarchy_available() {
-        let dd = theme_dd.clone();
-        let (r, _) = widgets::switch_row(
-            "Follow Omarchy theme",
-            "Match the desktop's colors and update live whenever the Omarchy theme changes.",
-            p.mode == prefs::ThemeMode::Omarchy,
-            move |on| {
-                prefs::update(|p| p.mode = if on { prefs::ThemeMode::Omarchy } else { prefs::ThemeMode::Theme });
-                dd.set_sensitive(!on);
-                theme::apply();
-            },
-        );
-        g.add(&r);
-    }
-    g.add(&theme_row);
-
-    let swatches = widgets::hbox(4);
-    let refresh_swatches = {
-        let swatches = swatches.clone();
-        move || {
-            while let Some(c) = swatches.first_child() {
-                swatches.remove(&c);
-            }
-            let pal = theme::current_palette();
-            for c in [&pal.bg, &pal.surface, &pal.muted, &pal.text, &pal.accent, &pal.danger] {
-                let s = gtk::Box::new(gtk::Orientation::Horizontal, 0);
-                s.add_css_class("swatch");
-                let provider = gtk::CssProvider::new();
-                provider.load_from_string(&format!("box {{ background: {c}; }}"));
-                #[allow(deprecated)]
-                s.style_context().add_provider(&provider, gtk::STYLE_PROVIDER_PRIORITY_USER);
-                swatches.append(&s);
-            }
-        }
-    };
-    refresh_swatches();
-    let last = std::cell::RefCell::new(theme::current_palette());
-    let weak = swatches.downgrade();
-    glib::timeout_add_seconds_local(1, move || {
-        if weak.upgrade().is_none() {
-            return glib::ControlFlow::Break;
-        }
-        let now = theme::current_palette();
-        if *last.borrow() != now {
-            *last.borrow_mut() = now;
-            refresh_swatches();
-        }
-        glib::ControlFlow::Continue
-    });
-    g.add(&widgets::row("Current colors", "", Some(swatches.upcast_ref())));
-
-    g.add(&nyx_ui::widgets::accent_row("torrents"));
-    let (r, _) =
-        widgets::switch_row("Reduce motion", "Turn off transitions and animations in this window.", p.reduce_motion, |on| {
-            prefs::update(|p| p.reduce_motion = on);
-            theme::apply();
-        });
-    g.add(&r);
-
     // ----- Behaviour -----
     let g = page.group("Behavior");
     let (r, _) = widgets::switch_row(
@@ -149,10 +69,34 @@ pub fn build(page: &Page) {
         "Make Torrents the app your browser hands them to.",
         Some(controls.upcast_ref()),
     ));
+}
 
-    // ----- Keyboard -----
-    let g = page.group("Keyboard");
-    for (keys, what) in crate::window::SHORTCUTS {
-        g.add(&widgets::row(what, "", Some(widgets::keycaps(keys).upcast_ref())));
-    }
+/// What the settings card's standard groups are built from.
+const STANDARD: nyx_ui::settings_card::Standard = nyx_ui::settings_card::Standard {
+    app: "torrents",
+    about: nyx_ui::settings_card::About {
+        name: "Torrents",
+        icon: "io.github.design_nexus.nyx.Torrents",
+        version: env!("CARGO_PKG_VERSION"),
+        description: "Download and share with BitTorrent, with search through qBittorrent plugins.",
+        licence: "MIT",
+        website: "https://github.com/design-nexus/nyx-torrents",
+        issues: "https://github.com/design-nexus/nyx-torrents/issues",
+        credits: &[("libtorrent", "BitTorrent")],
+    },
+    shortcuts: window::SHORTCUTS,
+    reduce_motion: || prefs::get().reduce_motion,
+    set_reduce_motion: |on| prefs::update(|p| p.reduce_motion = on),
+};
+
+pub fn build_appearance(page: &Page) {
+    nyx_ui::settings_card::standard_group(&page.body, "Appearance", &STANDARD);
+}
+
+pub fn build_keyboard(page: &Page) {
+    nyx_ui::settings_card::standard_group(&page.body, "Keyboard", &STANDARD);
+}
+
+pub fn build_about(page: &Page) {
+    nyx_ui::settings_card::standard_group(&page.body, "About", &STANDARD);
 }

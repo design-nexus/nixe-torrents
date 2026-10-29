@@ -19,7 +19,10 @@ const SUMMARIES: &[(&str, &str)] = &[
     ("connection", "Port, interface, proxy"),
     ("speed", "Limits, schedule"),
     ("bittorrent", "Discovery, queue, seeding"),
-    ("appearance", "Theme, window, shortcuts"),
+    ("behavior", "Background, notifications, magnet links"),
+    ("appearance", "Theme, accent, motion"),
+    ("keyboard", "Shortcuts"),
+    ("about", "Version, licence, links"),
 ];
 
 struct Dialog {
